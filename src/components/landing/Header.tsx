@@ -3,7 +3,7 @@ import { Menu, X } from "lucide-react";
 import { useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import labcibeLogo from "@/assets/LabCIBE-UNA.jpg";
-import { REPORTS_URL } from "@/lib/config";
+import { REPORTS_URL, REPORTS_LIST_URL } from "@/lib/config";
 
 const NAV_ITEMS: { id: string; label: string }[] = [
   { id: "about", label: "Acerca de" },
@@ -45,6 +45,11 @@ const Header = () => {
   const goToReportWizard = () => {
     closeMenu();
     window.location.href = REPORTS_URL;
+  };
+
+  const goToReportsList = () => {
+    closeMenu();
+    navigate(REPORTS_LIST_URL);
   };
 
   return (
@@ -102,6 +107,12 @@ const Header = () => {
                 {item.label}
               </button>
             ))}
+            <button
+              onClick={goToReportsList}
+              className="text-foreground hover:text-primary transition-colors font-medium"
+            >
+              Reportes
+            </button>
             <Button
               className="bg-primary hover:bg-primary/90 text-primary-foreground rounded-full font-semibold shadow-md hover:shadow-lg transition-all duration-300"
               onClick={goToReportWizard}
@@ -149,6 +160,12 @@ const Header = () => {
                   {item.label}
                 </button>
               ))}
+              <button
+                onClick={goToReportsList}
+                className="text-left py-2 px-4 text-foreground hover:bg-muted rounded-lg transition-colors font-medium"
+              >
+                Reportes
+              </button>
               <Button
                 className="bg-secondary hover:bg-secondary/90 text-secondary-foreground font-semibold shadow-md hover:shadow-lg transition-all duration-300 w-full"
                 onClick={goToReportWizard}
