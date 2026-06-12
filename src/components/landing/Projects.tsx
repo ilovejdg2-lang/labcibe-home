@@ -7,7 +7,8 @@ import {
   ArrowRight,
   ExternalLink,
 } from "lucide-react";
-import { REPORTS_URL } from "@/lib/config";
+import { Link } from "react-router-dom";
+import { REPORTS_URL, REPORTS_LIST_URL } from "@/lib/config";
 
 interface Project {
   icon: typeof ShieldAlert;
@@ -109,19 +110,30 @@ const Projects = () => {
                     <p className="text-muted-foreground leading-relaxed mb-4">
                       {project.description}
                     </p>
-                    <a
-                      href={project.cta.href}
-                      target={isExternal ? "_blank" : undefined}
-                      rel={isExternal ? "noopener noreferrer" : undefined}
-                      className="inline-flex items-center gap-1.5 text-primary font-semibold hover:text-primary/80 transition-colors"
-                    >
-                      {project.cta.label}
-                      {isExternal ? (
-                        <ExternalLink className="w-4 h-4" />
-                      ) : (
-                        <ArrowRight className="w-4 h-4" />
+                    <div className="flex flex-col gap-2">
+                      <a
+                        href={project.cta.href}
+                        target={isExternal ? "_blank" : undefined}
+                        rel={isExternal ? "noopener noreferrer" : undefined}
+                        className="inline-flex items-center gap-1.5 text-primary font-semibold hover:text-primary/80 transition-colors"
+                      >
+                        {project.cta.label}
+                        {isExternal ? (
+                          <ExternalLink className="w-4 h-4" />
+                        ) : (
+                          <ArrowRight className="w-4 h-4" />
+                        )}
+                      </a>
+                      {project.featured && (
+                        <Link
+                          to={REPORTS_LIST_URL}
+                          className="inline-flex items-center gap-1.5 text-primary font-semibold hover:text-primary/80 transition-colors"
+                        >
+                          Ver reportes registrados
+                          <ArrowRight className="w-4 h-4" />
+                        </Link>
                       )}
-                    </a>
+                    </div>
                   </div>
                 </div>
               </Card>
