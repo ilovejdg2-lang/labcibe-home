@@ -1,9 +1,10 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import { ArrowLeft, Loader2 } from "lucide-react";
+import { ArrowLeft } from "lucide-react";
 
 import Header from "@/components/landing/Header";
 import Footer from "@/components/landing/Footer";
+import StatusMessage from "@/components/ui/StatusMessage";
 import {
   Card,
   CardContent,
@@ -80,17 +81,13 @@ const Reports = () => {
             </div>
 
             {loading && (
-              <div className="flex items-center justify-center gap-2 py-16 text-muted-foreground">
-                <Loader2 className="w-5 h-5 animate-spin" />
-                Cargando reportes...
-              </div>
+              <StatusMessage
+                variant="loading"
+                message="Cargando reportes registrados..."
+              />
             )}
 
-            {error && (
-              <p className="text-sm text-destructive" role="alert">
-                {error}
-              </p>
-            )}
+            {error && <StatusMessage variant="error" message={error} />}
 
             {!loading && !error && reports.length === 0 && (
               <p className="text-sm text-muted-foreground py-8">
