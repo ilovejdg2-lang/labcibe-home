@@ -5,6 +5,14 @@
 [build.environment]
   NODE_VERSION = "20"
 
+# Proxy hacia el backend (evita mixed content y CORS)
+[[redirects]]
+  from = "/api/*"
+  to = "http://examenprogra4.runasp.net/api/:splat"
+  status = 200
+  force = true
+
+# React Router — SPA fallback (debe ir al final)
 [[redirects]]
   from = "/*"
   to = "/index.html"
