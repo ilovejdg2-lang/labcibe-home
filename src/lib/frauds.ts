@@ -6,6 +6,14 @@ export interface FraudReport {
   comments: string;
 }
 
+export interface Fraud {
+  id: number;
+  impostorDetails: string;
+  contactInfo: string;
+  comments: string;
+  createdAt: string;
+}
+
 function toFetchError(error: unknown, fallback: string): Error {
   if (error instanceof TypeError && error.message === "Failed to fetch") {
     return new Error(
@@ -16,6 +24,25 @@ function toFetchError(error: unknown, fallback: string): Error {
   if (error instanceof Error) return error;
 
   return new Error(fallback);
+}
+
+export async function getFraudReports(): Promise<Fraud[]> {
+  try {
+    const response = await fetch(`${API_URL}/api/Fraud`);
+
+    if (!response.ok) {
+      throw new Error(
+        "No se pudieron consultar los reportes. Intente de nuevo más tarde."
+      );
+    }
+
+    return response.json();
+  } catch (error) {
+    throw toFetchError(
+      error,
+      "No se pudieron consultar los reportes. Intente de nuevo más tarde."
+    );
+  }
 }
 
 export async function submitFraudReport(report: FraudReport): Promise<void> {

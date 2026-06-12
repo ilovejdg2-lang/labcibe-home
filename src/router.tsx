@@ -2,6 +2,7 @@ import { createBrowserRouter } from "react-router-dom";
 import Landing from "@/pages/Landing";
 import NotFound from "@/pages/NotFound";
 import ReportFraud from "@/pages/ReportFraud";
+import Reports from "@/pages/Reports";
 
 export const router = createBrowserRouter([
   {
@@ -11,6 +12,10 @@ export const router = createBrowserRouter([
   {
     path: "/reportar-estafa",
     element: <ReportFraud />,
+  },
+  {
+    path: "/reportes",
+    element: <Reports />,
   },
   {
     path: "*",
