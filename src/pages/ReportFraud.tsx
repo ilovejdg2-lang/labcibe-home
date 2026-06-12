@@ -12,14 +12,63 @@ const emptyForm = {
   comments: "",
 };
 
+type FormErrors = Partial<Record<keyof typeof emptyForm, string>>;
+
 const inputClass =
-  "w-full rounded-md border border-gray-300 bg-white px-3 py-2.5 text-sm text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-danger-600 focus-visible:border-danger-600";
+  "w-full rounded-md border bg-white px-3 py-2.5 text-sm text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-danger-600 focus-visible:border-danger-600";
+
+const requiredFields: (keyof typeof emptyForm)[] = [
+  "impostorName",
+  "impostorContact",
+];
+
+function validateForm(form: typeof emptyForm): FormErrors {
+  const errors: FormErrors = {};
+
+  if (!form.impostorName.trim()) {
+    errors.impostorName = "El nombre del impostor es obligatorio.";
+  }
+
+  if (!form.impostorContact.trim()) {
+    errors.impostorContact = "El contacto del estafador es obligatorio.";
+  }
+
+  return errors;
+}
 
 const ReportFraud = () => {
   const [form, setForm] = useState(emptyForm);
+  const [errors, setErrors] = useState<FormErrors>({});
+
+  const handleChange = (field: keyof typeof emptyForm, value: string) => {
+    setForm((prev) => ({ ...prev, [field]: value }));
+    if (errors[field]) {
+      setErrors((prev) => ({ ...prev, [field]: undefined }));
+    }
+  };
 
   const handleSubmit = (event: React.FormEvent) => {
     event.preventDefault();
+
+    const validationErrors = validateForm(form);
+    if (Object.keys(validationErrors).length > 0) {
+      setErrors(validationErrors);
+
+      const firstInvalidField = requiredFields.find(
+        (field) => validationErrors[field]
+      );
+      if (firstInvalidField) {
+        requestAnimationFrame(() => {
+          const field = document.getElementById(firstInvalidField);
+          field?.focus({ preventScroll: true });
+          field?.scrollIntoView({ behavior: "smooth", block: "center" });
+        });
+      }
+
+      return;
+    }
+
+    setErrors({});
   };
 
   return (
@@ -74,10 +123,27 @@ const ReportFraud = () => {
                     type="text"
                     value={form.impostorName}
                     onChange={(e) =>
-                      setForm({ ...form, impostorName: e.target.value })
+                      handleChange("impostorName", e.target.value)
                     }
-                    className={inputClass}
+                    aria-invalid={!!errors.impostorName}
+                    aria-describedby={
+                      errors.impostorName ? "impostorName-error" : undefined
+                    }
+                    className={`${inputClass} scroll-mt-24 ${
+                      errors.impostorName
+                        ? "border-danger-600"
+                        : "border-gray-300"
+                    }`}
                   />
+                  {errors.impostorName && (
+                    <p
+                      id="impostorName-error"
+                      className="mt-2 text-sm text-destructive"
+                      role="alert"
+                    >
+                      {errors.impostorName}
+                    </p>
+                  )}
                 </div>
 
                 <div>
@@ -95,10 +161,29 @@ const ReportFraud = () => {
                     type="text"
                     value={form.impostorContact}
                     onChange={(e) =>
-                      setForm({ ...form, impostorContact: e.target.value })
+                      handleChange("impostorContact", e.target.value)
                     }
-                    className={inputClass}
+                    aria-invalid={!!errors.impostorContact}
+                    aria-describedby={
+                      errors.impostorContact
+                        ? "impostorContact-error"
+                        : undefined
+                    }
+                    className={`${inputClass} scroll-mt-24 ${
+                      errors.impostorContact
+                        ? "border-danger-600"
+                        : "border-gray-300"
+                    }`}
                   />
+                  {errors.impostorContact && (
+                    <p
+                      id="impostorContact-error"
+                      className="mt-2 text-sm text-destructive"
+                      role="alert"
+                    >
+                      {errors.impostorContact}
+                    </p>
+                  )}
                 </div>
               </div>
 
@@ -118,10 +203,8 @@ const ReportFraud = () => {
                   id="comments"
                   rows={8}
                   value={form.comments}
-                  onChange={(e) =>
-                    setForm({ ...form, comments: e.target.value })
-                  }
-                  className={inputClass}
+                  onChange={(e) => handleChange("comments", e.target.value)}
+                  className={`${inputClass} border-gray-300`}
                 />
               </div>
 
