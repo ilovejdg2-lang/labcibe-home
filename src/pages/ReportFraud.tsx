@@ -1,10 +1,11 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
-import { ArrowLeft } from "lucide-react";
+import { ArrowLeft, Loader2 } from "lucide-react";
 
 import Header from "@/components/landing/Header";
 import Footer from "@/components/landing/Footer";
 import { Button } from "@/components/ui/button";
+import { submitFraudReport } from "@/lib/frauds";
 
 const emptyForm = {
   impostorName: "",
@@ -39,16 +40,23 @@ function validateForm(form: typeof emptyForm): FormErrors {
 const ReportFraud = () => {
   const [form, setForm] = useState(emptyForm);
   const [errors, setErrors] = useState<FormErrors>({});
+  const [submitting, setSubmitting] = useState(false);
+  const [submitError, setSubmitError] = useState<string | null>(null);
+  const [success, setSuccess] = useState(false);
 
   const handleChange = (field: keyof typeof emptyForm, value: string) => {
     setForm((prev) => ({ ...prev, [field]: value }));
     if (errors[field]) {
       setErrors((prev) => ({ ...prev, [field]: undefined }));
     }
+    if (submitError) setSubmitError(null);
+    if (success) setSuccess(false);
   };
 
-  const handleSubmit = (event: React.FormEvent) => {
+  const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
+    setSubmitError(null);
+    setSuccess(false);
 
     const validationErrors = validateForm(form);
     if (Object.keys(validationErrors).length > 0) {
@@ -69,6 +77,23 @@ const ReportFraud = () => {
     }
 
     setErrors({});
+    setSubmitting(true);
+
+    try {
+      await submitFraudReport({
+        impostorDetails: form.impostorName.trim(),
+        contactInfo: form.impostorContact.trim(),
+        comments: form.comments.trim(),
+      });
+      setForm(emptyForm);
+      setSuccess(true);
+    } catch (err) {
+      setSubmitError(
+        err instanceof Error ? err.message : "Error al enviar el reporte."
+      );
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   return (
@@ -208,8 +233,32 @@ const ReportFraud = () => {
                 />
               </div>
 
-              <Button type="submit" className="w-full sm:w-auto">
-                Enviar reporte
+              {submitError && (
+                <p className="text-sm text-destructive" role="alert">
+                  {submitError}
+                </p>
+              )}
+
+              {success && (
+                <p className="text-sm text-green-600" role="status">
+                  Reporte enviado correctamente. Gracias por contribuir a la
+                  seguridad digital.
+                </p>
+              )}
+
+              <Button
+                type="submit"
+                disabled={submitting}
+                className="w-full sm:w-auto"
+              >
+                {submitting ? (
+                  <>
+                    <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                    Enviando...
+                  </>
+                ) : (
+                  "Enviar reporte"
+                )}
               </Button>
             </form>
           </div>
